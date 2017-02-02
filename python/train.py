@@ -4,7 +4,7 @@ import sys
 import re
 import numpy as np
 import chainer
-from chainer import cuda, Function, gradient_check, Variable, optimizers, serializers, utils, Link, Chain, ChainList
+from chainer import cuda, Function, Variable, optimizers, serializers, Link, Chain, ChainList
 import chainer.functions as F
 import chainer.links as L
 from chainer.functions.loss.mean_squared_error import mean_squared_error as mse
@@ -12,23 +12,24 @@ from chainer.functions.loss.mean_squared_error import mean_squared_error as mse
 import dataloader as dl
 import net
 
-xp = cuda.cupy
-
+# loading sample train data
 fp_tr = "../data/wq_white_train.csv"
 X,Y = dl.loadCSVdata(fp_tr,11,delim=";")
-X_st = dl.stddata(X)
+X = dl.stddata(X)
 
+# params 
 n_units  = 1024
 n_sample = X.shape[0]
 n_cols = X.shape[1]
+
+# nnw model creation  
 model = net.MyChain(n_cols, n_units)
 
-#dev_id = 3
-#chainer.cuda.get_device(dev_id).use()
-#model.to_gpu()
+# optimizer 
 opt = optimizers.Adam()
 opt.setup(model)
 
+# learning loop
 loss_val = 10000
 epoch    = 0
 while loss_val > 0.001:
